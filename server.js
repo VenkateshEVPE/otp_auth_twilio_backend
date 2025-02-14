@@ -4,8 +4,8 @@ const cors = require("cors"); // Import CORS middleware
 const app = express();
 const port = 5000;
 
-const accountSid = "AC5cd935b9119ab5a82db3ac6cde7db989";
-const authToken = "8ea3f422236b925dc2aaf0992e156853";
+const accountSid = process.env.Account_Sid;
+const authToken = process.env.Auth_Token;
 const client = require("twilio")(accountSid, authToken); // Initialize Twilio client
 
 app.use(bodyParser.json());
@@ -31,7 +31,7 @@ function sendOTP(phoneNumber, otp) {
   return client.messages.create({
     body: `Your OTP is ${otp}`,
     from: "+12298007356",
-    to: "+91"+phoneNumber,
+    to: "+91" + phoneNumber,
   });
 }
 
@@ -44,13 +44,12 @@ app.post("/send-otp", async (req, res) => {
   otpStorage[phoneNumber] = otp;
   try {
     await sendOTP(phoneNumber, otp);
-    
+
     res.status(200).send("OTP sent successfully");
   } catch (error) {
     res.status(500).send("Error sending OTP");
   }
 });
-
 
 app.post("/verify-otp", (req, res) => {
   console.log(otpStorage);
